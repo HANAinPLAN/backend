@@ -18,36 +18,6 @@ services:
       - hanainplan-network
     restart: unless-stopped
 
-  # Redis 캐시 및 세션 스토어
-  redis:
-    image: redis:7-alpine
-    container_name: hanainplan-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
-    networks:
-      - hanainplan-network
-    restart: unless-stopped
-
-  # MongoDB 문서 데이터베이스
-  mongodb:
-    image: mongo:6.0
-    container_name: hanainplan-mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-      - ./docker/mongodb/init.js:/docker-entrypoint-initdb.d/init.js
-    networks:
-      - hanainplan-network
-    restart: unless-stopped
 
   # Spring Boot 애플리케이션
   hanainplan-app:
@@ -55,8 +25,6 @@ services:
     container_name: hanainplan-spring-app
     depends_on:
       - mysql
-      - redis
-      - mongodb
     ports:
       - "8080:8080"
     environment:
@@ -66,13 +34,6 @@ services:
       DB_NAME: ${MYSQL_DATABASE}
       DB_USERNAME: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      MONGODB_HOST: mongodb
-      MONGODB_PORT: 27017
-      MONGODB_DATABASE: ${MONGO_DATABASE}
-      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
-      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
     networks:
       - hanainplan-network
     restart: unless-stopped
@@ -107,8 +68,6 @@ services:
 
 volumes:
   mysql_data:
-  redis_data:
-  mongodb_data:
 
 networks:
   hanainplan-network:

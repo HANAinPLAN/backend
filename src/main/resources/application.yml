@@ -4,8 +4,6 @@ spring:
 
   application:
     name: hanainplan
-
-  # 이메일 설정 (개발 환경용 - 실제 발송되지 않음)
   mail:
     host: smtp.gmail.com
     port: 587
